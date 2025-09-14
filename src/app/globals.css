@@ -1,8 +1,22 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  /* ドローンショー専用カラー */
+  --drone-primary: #00ff88;
+  --drone-secondary: #ff6b35;
+  --drone-warning: #ffeb3b;
+  --drone-success: #4caf50;
+
+  /* 地図関連カラー */
+  --map-day: #e3f2fd;
+  --map-night: #0a0a0a;
+
+  /* 3D空間関連 */
+  --space-bg: #000015;
+  --space-grid: #333366;
 }
 
 @theme inline {
@@ -10,6 +24,20 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* ドローン関連カスタムクラス */
+  --color-drone-primary: var(--drone-primary);
+  --color-drone-secondary: var(--drone-secondary);
+  --color-drone-warning: var(--drone-warning);
+  --color-drone-success: var(--drone-success);
+
+  /* 地図関連カスタムクラス */
+  --color-map-day: var(--map-day);
+  --color-map-night: var(--map-night);
+
+  /* 3D空間関連カスタムクラス */
+  --color-space-bg: var(--space-bg);
+  --color-space-grid: var(--space-grid);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -20,7 +48,35 @@
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
+
+/* ドローンショー専用ユーティリティクラス */
+.drone-glow {
+  box-shadow: 0 0 20px var(--drone-primary);
+  filter: brightness(1.2);
+}
+
+.night-sky {
+  background: linear-gradient(180deg, var(--space-bg) 0%, #000033 100%);
+}
+
+.day-sky {
+  background: linear-gradient(180deg, #87ceeb 0%, #f0f8ff 100%);
+}
+
+.map-overlay {
+  backdrop-filter: blur(8px);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* 花火エフェクト用アニメーション */
+@keyframes firework {
+  0% { transform: scale(0); opacity: 1; }
+  50% { transform: scale(1); opacity: 0.8; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
+.firework-effect {
+  animation: firework 2s ease-out infinite;
 }
