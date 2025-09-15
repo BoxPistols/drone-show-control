@@ -66,11 +66,17 @@ export default function Home() {
               variant="contained"
               size="large"
               className="bg-drone-primary hover:bg-green-600 drone-glow"
+              href="/map"
             >
-              Start New Show
+              Open Map Control
             </Button>
-            <Button variant="outlined" size="large" className="text-white">
-              View Live Shows
+            <Button
+              variant="outlined"
+              size="large"
+              className="text-white"
+              href="/3d"
+            >
+              View 3D Scene
             </Button>
           </Box>
         </Paper>
@@ -109,9 +115,13 @@ export default function Home() {
                 Real-time 3D simulation of drone formations and patterns
               </Typography>
               <Box className="h-32 bg-space-bg rounded-lg flex items-center justify-center">
-                <Typography className="text-drone-primary">
-                  🌟 3D Scene Preview
-                </Typography>
+                <Button
+                  variant="contained"
+                  className="bg-drone-primary hover:bg-green-600"
+                  href="/3d"
+                >
+                  🌟 Launch 3D Scene
+                </Button>
               </Box>
             </CardContent>
           </Card>

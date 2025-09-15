@@ -1,0 +1,474 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Drone Show Control Schemas",
+  "definitions": {
+    "DronePosition": {
+      "type": "object",
+      "required": [
+        "id",
+        "name",
+        "latitude",
+        "longitude",
+        "altitude",
+        "status",
+        "battery",
+        "lastUpdate"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^drone-[a-zA-Z0-9-]+$",
+          "description": "Unique identifier for the drone"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 50,
+          "description": "Human-readable name for the drone"
+        },
+        "latitude": {
+          "type": "number",
+          "minimum": -90,
+          "maximum": 90,
+          "description": "GPS latitude coordinate"
+        },
+        "longitude": {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180,
+          "description": "GPS longitude coordinate"
+        },
+        "altitude": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 400,
+          "description": "Altitude in meters above ground level"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["active", "inactive", "warning", "error"],
+          "description": "Current operational status of the drone"
+        },
+        "battery": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Battery level as percentage"
+        },
+        "lastUpdate": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO timestamp of last status update"
+        }
+      }
+    },
+
+    "DroneCommand": {
+      "type": "object",
+      "required": ["droneId", "command", "parameters", "timestamp", "priority"],
+      "properties": {
+        "droneId": {
+          "type": "string",
+          "pattern": "^drone-[a-zA-Z0-9-]+$"
+        },
+        "command": {
+          "type": "string",
+          "enum": [
+            "takeoff",
+            "land",
+            "hover",
+            "move",
+            "rotate",
+            "light",
+            "emergency_land",
+            "return_home"
+          ]
+        },
+        "parameters": {
+          "$ref": "#/definitions/DroneCommandParameters"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "priority": {
+          "type": "string",
+          "enum": ["low", "normal", "high", "emergency"]
+        }
+      }
+    },
+
+    "DroneCommandParameters": {
+      "type": "object",
+      "properties": {
+        "position": {
+          "type": "object",
+          "properties": {
+            "latitude": {
+              "type": "number",
+              "minimum": -90,
+              "maximum": 90
+            },
+            "longitude": {
+              "type": "number",
+              "minimum": -180,
+              "maximum": 180
+            },
+            "altitude": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 400
+            }
+          }
+        },
+        "rotation": {
+          "type": "object",
+          "properties": {
+            "yaw": {
+              "type": "number",
+              "minimum": -180,
+              "maximum": 180
+            },
+            "pitch": {
+              "type": "number",
+              "minimum": -90,
+              "maximum": 90
+            },
+            "roll": {
+              "type": "number",
+              "minimum": -180,
+              "maximum": 180
+            }
+          }
+        },
+        "speed": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 20,
+          "description": "Speed in m/s"
+        },
+        "duration": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Duration in seconds"
+        },
+        "lightColor": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$",
+          "description": "Hex color code for LED lights"
+        },
+        "lightIntensity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Light intensity as percentage"
+        }
+      }
+    },
+
+    "DroneFormation": {
+      "type": "object",
+      "required": [
+        "id",
+        "name",
+        "description",
+        "dronePositions",
+        "centerPoint",
+        "scale",
+        "rotation"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^formation-[a-zA-Z0-9-]+$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 50
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "dronePositions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["droneId", "relativePosition", "role"],
+            "properties": {
+              "droneId": {
+                "type": "string",
+                "pattern": "^drone-[a-zA-Z0-9-]+$"
+              },
+              "relativePosition": {
+                "type": "object",
+                "required": ["x", "y", "z"],
+                "properties": {
+                  "x": {
+                    "type": "number",
+                    "minimum": -1000,
+                    "maximum": 1000,
+                    "description": "X coordinate relative to center (meters)"
+                  },
+                  "y": {
+                    "type": "number",
+                    "minimum": -1000,
+                    "maximum": 1000,
+                    "description": "Y coordinate relative to center (meters)"
+                  },
+                  "z": {
+                    "type": "number",
+                    "minimum": -200,
+                    "maximum": 400,
+                    "description": "Z coordinate relative to center (meters)"
+                  }
+                }
+              },
+              "role": {
+                "type": "string",
+                "enum": ["leader", "follower", "anchor"]
+              }
+            }
+          }
+        },
+        "centerPoint": {
+          "type": "object",
+          "required": ["latitude", "longitude", "altitude"],
+          "properties": {
+            "latitude": {
+              "type": "number",
+              "minimum": -90,
+              "maximum": 90
+            },
+            "longitude": {
+              "type": "number",
+              "minimum": -180,
+              "maximum": 180
+            },
+            "altitude": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 400
+            }
+          }
+        },
+        "scale": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 10,
+          "description": "Scale factor for the formation"
+        },
+        "rotation": {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180,
+          "description": "Rotation angle in degrees"
+        }
+      }
+    },
+
+    "ShowSequence": {
+      "type": "object",
+      "required": ["id", "name", "formations", "totalDuration"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^sequence-[a-zA-Z0-9-]+$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "formations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "formationId",
+              "startTime",
+              "duration",
+              "transition",
+              "transitionDuration"
+            ],
+            "properties": {
+              "formationId": {
+                "type": "string",
+                "pattern": "^formation-[a-zA-Z0-9-]+$"
+              },
+              "startTime": {
+                "type": "number",
+                "minimum": 0,
+                "description": "Start time in seconds from sequence start"
+              },
+              "duration": {
+                "type": "number",
+                "minimum": 1,
+                "description": "Duration in seconds"
+              },
+              "transition": {
+                "type": "string",
+                "enum": [
+                  "immediate",
+                  "fade",
+                  "slide",
+                  "spiral",
+                  "explosion",
+                  "custom"
+                ]
+              },
+              "transitionDuration": {
+                "type": "number",
+                "minimum": 0,
+                "description": "Transition duration in seconds"
+              }
+            }
+          }
+        },
+        "totalDuration": {
+          "type": "number",
+          "minimum": 1,
+          "description": "Total sequence duration in seconds"
+        },
+        "music": {
+          "type": "object",
+          "properties": {
+            "filename": {
+              "type": "string",
+              "pattern": "\\.(mp3|wav|ogg)$"
+            },
+            "startOffset": {
+              "type": "number",
+              "minimum": 0,
+              "description": "Music start offset in seconds"
+            }
+          }
+        }
+      }
+    },
+
+    "FlightPlan": {
+      "type": "object",
+      "required": [
+        "droneId",
+        "waypoints",
+        "totalDistance",
+        "estimatedFlightTime",
+        "safetyMargins"
+      ],
+      "properties": {
+        "droneId": {
+          "type": "string",
+          "pattern": "^drone-[a-zA-Z0-9-]+$"
+        },
+        "waypoints": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Waypoint"
+          }
+        },
+        "totalDistance": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Total flight distance in meters"
+        },
+        "estimatedFlightTime": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Estimated flight time in seconds"
+        },
+        "safetyMargins": {
+          "type": "object",
+          "required": ["altitudeBuffer", "lateralBuffer", "temporalBuffer"],
+          "properties": {
+            "altitudeBuffer": {
+              "type": "number",
+              "minimum": 1,
+              "maximum": 50,
+              "description": "Altitude safety buffer in meters"
+            },
+            "lateralBuffer": {
+              "type": "number",
+              "minimum": 1,
+              "maximum": 100,
+              "description": "Lateral safety buffer in meters"
+            },
+            "temporalBuffer": {
+              "type": "number",
+              "minimum": 0.1,
+              "maximum": 60,
+              "description": "Temporal safety buffer in seconds"
+            }
+          }
+        }
+      }
+    },
+
+    "Waypoint": {
+      "type": "object",
+      "required": ["id", "position", "timestamp", "speed"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^waypoint-[a-zA-Z0-9-]+$"
+        },
+        "position": {
+          "type": "object",
+          "required": ["latitude", "longitude", "altitude"],
+          "properties": {
+            "latitude": {
+              "type": "number",
+              "minimum": -90,
+              "maximum": 90
+            },
+            "longitude": {
+              "type": "number",
+              "minimum": -180,
+              "maximum": 180
+            },
+            "altitude": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 400
+            }
+          }
+        },
+        "timestamp": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Time to reach this waypoint (seconds from start)"
+        },
+        "speed": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 20,
+          "description": "Speed to maintain to next waypoint (m/s)"
+        },
+        "action": {
+          "$ref": "#/definitions/WaypointAction"
+        }
+      }
+    },
+
+    "WaypointAction": {
+      "type": "object",
+      "required": ["type", "parameters", "duration"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["hover", "light", "rotate", "wait"]
+        },
+        "parameters": {
+          "type": "object",
+          "description": "Action-specific parameters"
+        },
+        "duration": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Action duration in seconds"
+        }
+      }
+    }
+  }
+}

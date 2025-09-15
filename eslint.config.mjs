@@ -19,6 +19,8 @@ const eslintConfig = [
       ],
       '@typescript-eslint/no-explicit-any': 'warn',
     },
+  },
+  {
     ignores: [
       'node_modules/**',
       '.next/**',
