@@ -173,7 +173,7 @@ export default function PatternGenerator({
         </Typography>
         <Grid container spacing={2}>
           {patternOptions.map((option) => (
-            <Grid item xs={12} md={4} key={option.type}>
+            <Grid size={{ xs: 12, md: 4 }} key={option.type}>
               <Card
                 className={`cursor-pointer transition-all hover:shadow-md ${
                   selectedPattern === option.type
@@ -206,7 +206,7 @@ export default function PatternGenerator({
         </Typography>
         <Grid container spacing={3}>
           {/* Center Position */}
-          <Grid item xs={12} md={6}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <Typography variant="subtitle2" className="mb-2">
               中心座標
             </Typography>
@@ -254,7 +254,7 @@ export default function PatternGenerator({
           </Grid>
 
           {/* Pattern Size */}
-          <Grid item xs={12} md={6}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <Typography variant="subtitle2" className="mb-2">
               パターンサイズ
             </Typography>

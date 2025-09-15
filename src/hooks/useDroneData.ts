@@ -3,106 +3,80 @@
 import { useState, useEffect } from 'react';
 import { DronePosition } from '@/types/drone';
 
-// Mock data for development - 東京周辺の座標
-const generateMockDrones = (): DronePosition[] => {
-  const basePositions = [
-    { lat: 35.6762, lng: 139.6503, name: 'Tokyo Station' },
-    { lat: 35.6586, lng: 139.7454, name: 'Tokyo Skytree' },
-    { lat: 35.6598, lng: 139.7006, name: 'Imperial Palace' },
-    { lat: 35.6284, lng: 139.7387, name: 'Asakusa' },
-    { lat: 35.6938, lng: 139.7036, name: 'Ueno Park' },
-    { lat: 35.647, lng: 139.7164, name: 'Nihonbashi' },
-    { lat: 35.6654, lng: 139.7707, name: 'Sumida Park' },
-    { lat: 35.6809, lng: 139.7669, name: 'Kinshicho' },
-    { lat: 35.698, lng: 139.7731, name: 'Oshiage' },
-    { lat: 35.6433, lng: 139.6917, name: 'Marunouchi' },
-    { lat: 35.6851, lng: 139.7528, name: 'Mukojima' },
-    { lat: 35.6617, lng: 139.704, name: 'Tsukiji' },
-  ];
+const dummyDrones: DronePosition[] = [
+  {
+    id: 'drone-1',
+    name: 'Alpha-1',
+    latitude: 35.678,
+    longitude: 139.655,
+    altitude: 50,
+    battery: 85,
+    status: 'active',
+    lastUpdate: new Date(),
+  },
+  {
+    id: 'drone-2',
+    name: 'Bravo-2',
+    latitude: 35.675,
+    longitude: 139.652,
+    altitude: 60,
+    battery: 25,
+    status: 'warning',
+    lastUpdate: new Date(),
+  },
+  {
+    id: 'drone-3',
+    name: 'Charlie-3',
+    latitude: 35.679,
+    longitude: 139.651,
+    altitude: 55,
+    battery: 95,
+    status: 'active',
+    lastUpdate: new Date(),
+  },
+  {
+    id: 'drone-4',
+    name: 'Delta-4',
+    latitude: 35.676,
+    longitude: 139.648,
+    altitude: 0,
+    battery: 10,
+    status: 'error',
+    lastUpdate: new Date(),
+  },
+  {
+    id: 'drone-5',
+    name: 'Echo-5',
+    latitude: 35.674,
+    longitude: 139.656,
+    altitude: 70,
+    battery: 70,
+    status: 'active',
+    lastUpdate: new Date(),
+  },
+];
 
-  const statuses: DronePosition['status'][] = [
-    'active',
-    'active',
-    'active',
-    'active',
-    'active',
-    'active',
-    'active',
-    'warning',
-    'active',
-    'inactive',
-    'active',
-    'error',
-  ];
-
-  return basePositions.map((pos, index) => ({
-    id: `drone-${index + 1}`,
-    name: `Drone ${index + 1}`,
-    latitude: pos.lat + (Math.random() - 0.5) * 0.01, // Add some randomness
-    longitude: pos.lng + (Math.random() - 0.5) * 0.01,
-    altitude: Math.floor(Math.random() * 100) + 50, // 50-150m
-    status: statuses[index],
-    battery: Math.floor(Math.random() * 60) + 40, // 40-100%
-    lastUpdate: new Date(Date.now() - Math.random() * 300000), // Within last 5 minutes
-  }));
-};
-
-export const useDroneData = () => {
+export function useDroneData() {
   const [drones, setDrones] = useState<DronePosition[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    // Simulate API call
-    const fetchDroneData = async () => {
-      try {
-        setLoading(true);
-        // Simulate network delay
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-
-        const mockDrones = generateMockDrones();
-        setDrones(mockDrones);
-        setError(null);
-      } catch (err) {
-        setError('Failed to fetch drone data');
-        console.error('Error fetching drone data:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchDroneData();
-
-    // Simulate real-time updates
-    const interval = setInterval(() => {
-      setDrones((currentDrones) =>
-        currentDrones.map((drone) => ({
-          ...drone,
-          // Slightly update positions to simulate movement
-          latitude: drone.latitude + (Math.random() - 0.5) * 0.0001,
-          longitude: drone.longitude + (Math.random() - 0.5) * 0.0001,
-          altitude: Math.max(
-            30,
-            Math.min(200, drone.altitude + (Math.random() - 0.5) * 5)
-          ),
-          battery: Math.max(0, drone.battery - Math.random() * 0.1),
-          lastUpdate: new Date(),
-        }))
-      );
-    }, 3000); // Update every 3 seconds
-
-    return () => clearInterval(interval);
-  }, []);
+  const fetchDroneData = () => {
+    setLoading(true);
+    setError(null);
+    setTimeout(() => {
+      setDrones(dummyDrones);
+      setLoading(false);
+    }, 1000);
+  };
 
   const refreshDroneData = () => {
-    const mockDrones = generateMockDrones();
-    setDrones(mockDrones);
+    fetchDroneData();
   };
 
-  return {
-    drones,
-    loading,
-    error,
-    refreshDroneData,
-  };
-};
+  useEffect(() => {
+    fetchDroneData();
+  }, []);
+
+  return { drones, loading, error, refreshDroneData };
+}

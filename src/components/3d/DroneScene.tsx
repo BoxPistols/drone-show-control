@@ -91,6 +91,10 @@ function Drone3D({ drone }: Drone3DProps) {
 }
 
 function Scene({ drones = [] }: { drones: DronePosition[] }) {
+  useFrame((state) => {
+    state.scene.fog = new THREE.FogExp2(0x0a0a0a, 0.02);
+  });
+
   return (
     <>
       {/* Lighting */}

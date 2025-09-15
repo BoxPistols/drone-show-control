@@ -19,27 +19,6 @@
   --space-grid: #333366;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-
-  /* ドローン関連カスタムクラス */
-  --color-drone-primary: var(--drone-primary);
-  --color-drone-secondary: var(--drone-secondary);
-  --color-drone-warning: var(--drone-warning);
-  --color-drone-success: var(--drone-success);
-
-  /* 地図関連カスタムクラス */
-  --color-map-day: var(--map-day);
-  --color-map-night: var(--map-night);
-
-  /* 3D空間関連カスタムクラス */
-  --color-space-bg: var(--space-bg);
-  --color-space-grid: var(--space-grid);
-}
-
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
@@ -88,4 +67,12 @@ body {
 
 .firework-effect {
   animation: firework 2s ease-out infinite;
+}
+
+/* Drone Marker CSS */
+.drone-marker {
+  transition: transform 0.2s ease-out;
+}
+.drone-marker:hover {
+  transform: scale(1.2) rotate(45deg);
 }

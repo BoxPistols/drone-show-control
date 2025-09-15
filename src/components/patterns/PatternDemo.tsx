@@ -347,7 +347,7 @@ export default function PatternDemo({
 
         <Grid container spacing={2}>
           {demoPatterns.map((pattern, index) => (
-            <Grid item xs={12} sm={6} md={3} key={pattern.id}>
+            <Grid size={{ xs: 12, sm: 6, md: 3 }} key={pattern.id}>
               <Card
                 className={`cursor-pointer transition-all hover:shadow-md ${
                   currentPatternIndex === index
