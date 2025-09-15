@@ -10,12 +10,16 @@ interface DroneLightProps {
   drone: DronePosition;
   showLabels?: boolean;
   lightIntensity?: number;
+  onDroneClick?: (drone: DronePosition) => void;
+  isSelected?: boolean;
 }
 
 export function DroneLight({
   drone,
   showLabels = false,
   lightIntensity = 1,
+  onDroneClick,
+  isSelected = false,
 }: DroneLightProps) {
   const lightRef = useRef<THREE.PointLight>(null);
   const sphereRef = useRef<THREE.Mesh>(null);
@@ -99,6 +103,12 @@ export function DroneLight({
     }
   });
 
+  // クリックハンドラー
+  const handleClick = (event: any) => {
+    event.stopPropagation();
+    onDroneClick?.(drone);
+  };
+
   return (
     <group position={[x, y, z]}>
       {/* メインの光源（ドローンのLED） */}
@@ -110,15 +120,39 @@ export function DroneLight({
         decay={2}
       />
 
-      {/* 光る球体（光の可視化） */}
-      <Sphere ref={sphereRef} args={[0.3]}>
+      {/* クリック可能な光る球体（光の可視化） */}
+      <Sphere
+        ref={sphereRef}
+        args={[0.3]}
+        onClick={handleClick}
+        onPointerOver={(e) => {
+          e.stopPropagation();
+          document.body.style.cursor = 'pointer';
+        }}
+        onPointerOut={(e) => {
+          e.stopPropagation();
+          document.body.style.cursor = 'default';
+        }}
+      >
         <meshBasicMaterial
           color={color}
           transparent
           opacity={batteryAlpha}
-          toneMapped={false} // HDR色彩を維持
+          toneMapped={false}
         />
       </Sphere>
+
+      {/* 選択時のリング表示 */}
+      {isSelected && (
+        <Sphere args={[0.5]}>
+          <meshBasicMaterial
+            color="#ffffff"
+            transparent
+            opacity={0.6}
+            wireframe
+          />
+        </Sphere>
+      )}
 
       {/* 光のハロー効果 */}
       <Sphere args={[0.6]}>

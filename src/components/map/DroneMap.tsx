@@ -122,23 +122,72 @@ export default function DroneMap({
     drones.forEach((drone) => {
       const markerElement = document.createElement('div');
       markerElement.className = 'drone-marker';
+      markerElement.setAttribute('data-drone-id', drone.id);
+      markerElement.setAttribute('data-drone-name', drone.name);
+      markerElement.setAttribute('data-battery', drone.battery.toString());
+      markerElement.setAttribute('data-status', drone.status);
+      markerElement.setAttribute('data-altitude', drone.altitude.toString());
+
+      const lightColor = drone.lightColor || getDroneColor(drone.status);
+      const isLowBattery = drone.battery < 30;
+      const baseSize = isLowBattery ? 28 : 32;
+      const pulseAnimation =
+        drone.status === 'warning' ? 'animation: pulse 1s infinite;' : '';
+
       markerElement.style.cssText = `
-        width: 32px;
-        height: 32px;
+        width: ${baseSize}px;
+        height: ${baseSize}px;
         cursor: pointer;
-        color: ${getDroneColor(drone.status)};
-        filter: drop-shadow(0 0 6px currentColor);
+        color: ${lightColor};
+        filter: drop-shadow(0 0 8px ${lightColor}) brightness(${drone.battery / 100});
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 24px;
+        font-size: ${isLowBattery ? 20 : 24}px;
         transform: rotate(45deg);
+        transition: all 0.3s ease;
+        ${pulseAnimation}
+        opacity: ${Math.max(0.3, drone.battery / 100)};
       `;
-      markerElement.innerHTML = '✈️';
+
+      // ドローンの状態に応じたアイコン
+      const icon =
+        drone.status === 'error'
+          ? '🚨'
+          : drone.status === 'warning'
+            ? '⚠️'
+            : '✈️';
+      markerElement.innerHTML = `
+        <div style="position: relative;">
+          ${icon}
+          <div style="
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            width: 12px;
+            height: 12px;
+            background: ${lightColor};
+            border: 2px solid white;
+            border-radius: 50%;
+            box-shadow: 0 0 4px ${lightColor};
+          "></div>
+        </div>
+      `;
 
       const marker = new maplibregl.Marker(markerElement)
         .setLngLat([drone.longitude, drone.latitude])
         .addTo(mapRef.current!);
+
+      // ホバーエフェクト
+      markerElement.addEventListener('mouseenter', () => {
+        markerElement.style.transform = 'rotate(45deg) scale(1.2)';
+        markerElement.style.zIndex = '1000';
+      });
+
+      markerElement.addEventListener('mouseleave', () => {
+        markerElement.style.transform = 'rotate(45deg) scale(1)';
+        markerElement.style.zIndex = 'auto';
+      });
 
       markerElement.addEventListener('click', () => handleMarkerClick(drone));
       markersRef.current.set(drone.id, marker);
@@ -205,12 +254,71 @@ export default function DroneMap({
           </Typography>
         </Box>
 
+        {/* Light Settings */}
+        {drone.lightColor && (
+          <Box className="space-y-1">
+            <Typography variant="body2" color="textSecondary">
+              Light Settings:
+            </Typography>
+            <Box className="flex items-center justify-between">
+              <Typography variant="caption">Color:</Typography>
+              <Box
+                sx={{
+                  width: 16,
+                  height: 16,
+                  backgroundColor: drone.lightColor,
+                  borderRadius: '50%',
+                  border: '1px solid #ccc',
+                }}
+              />
+            </Box>
+            {drone.lightIntensity && (
+              <Box className="flex items-center justify-between">
+                <Typography variant="caption">Intensity:</Typography>
+                <Typography variant="caption">
+                  {drone.lightIntensity.toFixed(1)}
+                </Typography>
+              </Box>
+            )}
+            {drone.lightEffect && (
+              <Box className="flex items-center justify-between">
+                <Typography variant="caption">Effect:</Typography>
+                <Chip
+                  label={drone.lightEffect}
+                  size="small"
+                  variant="outlined"
+                />
+              </Box>
+            )}
+          </Box>
+        )}
+
         <Box className="flex items-center justify-between">
           <Typography variant="body2" color="textSecondary">
             Last Update:
           </Typography>
           <Typography variant="caption">
             {drone.lastUpdate.toLocaleTimeString()}
+          </Typography>
+        </Box>
+
+        {/* Data Binding Info */}
+        <Box className="mt-2 p-2 bg-gray-50 dark:bg-gray-800 rounded">
+          <Typography
+            variant="caption"
+            color="textSecondary"
+            className="block mb-1"
+          >
+            Data Binding:
+          </Typography>
+          <Typography variant="caption" className="block">
+            ID: {drone.id}
+          </Typography>
+          <Typography variant="caption" className="block">
+            Signal: {Math.round(drone.battery / 10) * 10}% strength
+          </Typography>
+          <Typography variant="caption" className="block">
+            Ping: {Math.round(Math.random() * 50 + 10)}ms
           </Typography>
         </Box>
       </Box>

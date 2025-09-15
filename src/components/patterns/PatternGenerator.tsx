@@ -6,7 +6,6 @@ import {
   Paper,
   Typography,
   Button,
-  TextField,
   Slider,
   Card,
   CardContent,
@@ -207,84 +206,114 @@ export default function PatternGenerator({
         <Grid container spacing={3}>
           {/* Center Position */}
           <Grid size={{ xs: 12, md: 6 }}>
-            <Typography variant="subtitle2" className="mb-2">
+            <Typography variant="subtitle2" className="mb-3">
               中心座標
             </Typography>
-            <TextField
-              label="緯度"
-              type="number"
-              size="small"
-              fullWidth
-              value={patternParams.centerLat}
-              onChange={(e) =>
-                setPatternParams((prev) => ({
-                  ...prev,
-                  centerLat: parseFloat(e.target.value) || 0,
-                }))
-              }
-              className="mb-2"
-            />
-            <TextField
-              label="経度"
-              type="number"
-              size="small"
-              fullWidth
-              value={patternParams.centerLng}
-              onChange={(e) =>
-                setPatternParams((prev) => ({
-                  ...prev,
-                  centerLng: parseFloat(e.target.value) || 0,
-                }))
-              }
-              className="mb-2"
-            />
-            <TextField
-              label="高度 (m)"
-              type="number"
-              size="small"
-              fullWidth
-              value={patternParams.centerAlt}
-              onChange={(e) =>
-                setPatternParams((prev) => ({
-                  ...prev,
-                  centerAlt: parseFloat(e.target.value) || 0,
-                }))
-              }
-            />
+            <Box className="space-y-3">
+              <Box>
+                <label
+                  htmlFor="centerLat"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  緯度
+                </label>
+                <input
+                  id="centerLat"
+                  type="number"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  value={patternParams.centerLat}
+                  onChange={(e) =>
+                    setPatternParams((prev) => ({
+                      ...prev,
+                      centerLat: parseFloat(e.target.value) || 0,
+                    }))
+                  }
+                />
+              </Box>
+              <Box>
+                <label
+                  htmlFor="centerLng"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  経度
+                </label>
+                <input
+                  id="centerLng"
+                  type="number"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  value={patternParams.centerLng}
+                  onChange={(e) =>
+                    setPatternParams((prev) => ({
+                      ...prev,
+                      centerLng: parseFloat(e.target.value) || 0,
+                    }))
+                  }
+                />
+              </Box>
+              <Box>
+                <label
+                  htmlFor="centerAlt"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  高度 (m)
+                </label>
+                <input
+                  id="centerAlt"
+                  type="number"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  value={patternParams.centerAlt}
+                  onChange={(e) =>
+                    setPatternParams((prev) => ({
+                      ...prev,
+                      centerAlt: parseFloat(e.target.value) || 0,
+                    }))
+                  }
+                />
+              </Box>
+            </Box>
           </Grid>
 
           {/* Pattern Size */}
           <Grid size={{ xs: 12, md: 6 }}>
-            <Typography variant="subtitle2" className="mb-2">
+            <Typography variant="subtitle2" className="mb-3">
               パターンサイズ
             </Typography>
-            <Box className="px-2">
-              <Typography variant="caption" color="textSecondary">
-                サイズ: {patternParams.size}m
-              </Typography>
-              <Slider
-                value={patternParams.size}
-                onChange={(_, value) =>
-                  setPatternParams((prev) => ({
-                    ...prev,
-                    size: value as number,
-                  }))
-                }
-                min={10}
-                max={100}
-                step={5}
-                valueLabelDisplay="auto"
-                className="mb-4"
-              />
+            <Box className="space-y-4">
+              <Box>
+                <label
+                  htmlFor="patternSize"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  サイズ: {patternParams.size}m
+                </label>
+                <Slider
+                  id="patternSize"
+                  value={patternParams.size}
+                  onChange={(_, value) =>
+                    setPatternParams((prev) => ({
+                      ...prev,
+                      size: value as number,
+                    }))
+                  }
+                  min={10}
+                  max={100}
+                  step={5}
+                  valueLabelDisplay="auto"
+                />
+              </Box>
             </Box>
 
             {/* Star-specific parameters */}
             {selectedPattern === 'star' && (
-              <Box className="px-2">
-                <Typography variant="caption" color="textSecondary">
+              <Box>
+                <label
+                  htmlFor="starPoints"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
                   星の角数: {patternParams.starPoints}
-                </Typography>
+                </label>
                 <Slider
+                  id="starPoints"
                   value={patternParams.starPoints}
                   onChange={(_, value) =>
                     setPatternParams((prev) => ({
@@ -296,17 +325,20 @@ export default function PatternGenerator({
                   max={8}
                   step={1}
                   valueLabelDisplay="auto"
-                  className="mb-4"
                 />
               </Box>
             )}
 
             {/* Rotation */}
-            <Box className="px-2">
-              <Typography variant="caption" color="textSecondary">
+            <Box>
+              <label
+                htmlFor="rotation"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 回転角度: {patternParams.rotation}°
-              </Typography>
+              </label>
               <Slider
+                id="rotation"
                 value={patternParams.rotation}
                 onChange={(_, value) =>
                   setPatternParams((prev) => ({

@@ -1,6 +1,11 @@
 {
   "permissions": {
-    "allow": ["Bash(pnpm dev:*)", "Bash(pnpm list:*)", "Bash(pnpm build:*)"],
+    "allow": [
+      "Bash(pnpm dev:*)",
+      "Bash(pnpm list:*)",
+      "Bash(pnpm build:*)",
+      "Bash(npm run build:*)"
+    ],
     "deny": [],
     "ask": []
   }

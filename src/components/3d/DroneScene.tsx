@@ -1,11 +1,12 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import { Box as MuiBox } from '@mui/material';
 import { DronePosition } from '@/types/drone';
 import { DroneLight } from './DroneLight';
+import { DroneInfoPanel } from './DroneInfoPanel';
 import * as THREE from 'three';
 
 interface DroneSceneProps {
@@ -19,10 +20,14 @@ function Scene({
   drones = [],
   showLabels = false,
   lightIntensity = 1,
+  onDroneClick,
+  selectedDroneId,
 }: {
   drones: DronePosition[];
   showLabels?: boolean;
   lightIntensity?: number;
+  onDroneClick?: (drone: DronePosition) => void;
+  selectedDroneId?: string;
 }) {
   useFrame((state) => {
     // 深い夜の霧効果（光をより幻想的に）
@@ -72,6 +77,8 @@ function Scene({
           drone={drone}
           showLabels={showLabels}
           lightIntensity={lightIntensity}
+          onDroneClick={onDroneClick}
+          isSelected={selectedDroneId === drone.id}
         />
       ))}
 
@@ -96,8 +103,20 @@ export default function DroneScene({
   showLabels = false,
   lightIntensity = 1.0,
 }: DroneSceneProps) {
+  const [selectedDrone, setSelectedDrone] = useState<DronePosition | null>(
+    null
+  );
+
+  const handleDroneClick = (drone: DronePosition) => {
+    setSelectedDrone(selectedDrone?.id === drone.id ? null : drone);
+  };
+
+  const handleClosePanel = () => {
+    setSelectedDrone(null);
+  };
+
   return (
-    <MuiBox className={`w-full h-full ${className}`}>
+    <MuiBox className={`w-full h-full relative ${className}`}>
       <Canvas
         camera={{ position: [20, 15, 20], fov: 75 }}
         gl={{
@@ -114,8 +133,13 @@ export default function DroneScene({
           drones={drones}
           showLabels={showLabels}
           lightIntensity={lightIntensity}
+          onDroneClick={handleDroneClick}
+          selectedDroneId={selectedDrone?.id}
         />
       </Canvas>
+
+      {/* ドローン情報パネル */}
+      <DroneInfoPanel drone={selectedDrone} onClose={handleClosePanel} />
     </MuiBox>
   );
 }
