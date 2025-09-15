@@ -22,6 +22,7 @@ import { useState } from 'react';
 import { useTheme } from '@/lib/theme/ThemeProvider';
 import { useDroneData } from '@/hooks/useDroneData';
 import PatternGenerator from '@/components/patterns/PatternGenerator';
+import PatternDemo from '@/components/patterns/PatternDemo';
 import DroneScene from '@/components/3d/DroneScene';
 import DroneMap from '@/components/map/DroneMap';
 import { DroneFormation, DronePosition } from '@/types/drone';
@@ -140,8 +141,8 @@ export default function PatternsPage() {
       <Box className="flex-1 p-4">
         {/* Info Banner */}
         <Alert severity="info" className="mb-4" icon={<AutoAwesome />}>
-          基本的なドローンショーパターン（星型・三角形・円形）を生成できます。
-          パラメータを調整してパターンを生成し、3Dビューやマップでプレビューしてください。
+          ドローンショーのパターン生成とシミュレーション。カスタムパターンを作成するか、
+          デモショーで複数のフォーメーションが動く様子を確認できます。
         </Alert>
 
         {/* Tabs */}
@@ -155,6 +156,7 @@ export default function PatternsPage() {
             <Tab label="パターン生成" />
             <Tab label="3Dプレビュー" />
             <Tab label="マッププレビュー" />
+            <Tab label="ショーシミュレーション" />
           </Tabs>
         </Paper>
 
@@ -214,6 +216,16 @@ export default function PatternsPage() {
               </Typography>
             </Paper>
           )}
+        </TabPanel>
+
+        <TabPanel value={tabValue} index={3}>
+          <PatternDemo
+            drones={drones}
+            onDroneUpdate={(updatedDrones) => {
+              // シミュレーション中のドローン更新をハンドル
+              setPreviewDrones(updatedDrones);
+            }}
+          />
         </TabPanel>
       </Box>
     </Box>

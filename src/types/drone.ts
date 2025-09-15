@@ -7,6 +7,10 @@ export interface DronePosition {
   status: 'active' | 'inactive' | 'warning' | 'error';
   battery: number;
   lastUpdate: Date;
+  // ショー用の光の色情報
+  lightColor?: string;
+  lightIntensity?: number;
+  lightEffect?: 'steady' | 'pulse' | 'strobe' | 'fade';
 }
 
 export interface DroneShowPattern {

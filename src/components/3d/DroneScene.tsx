@@ -1,138 +1,90 @@
 'use client';
 
-import { useRef, useMemo } from 'react';
+import React from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, Box, Sphere, Text } from '@react-three/drei';
+import { OrbitControls } from '@react-three/drei';
 import { Box as MuiBox } from '@mui/material';
 import { DronePosition } from '@/types/drone';
+import { DroneLight } from './DroneLight';
 import * as THREE from 'three';
 
 interface DroneSceneProps {
   drones?: DronePosition[];
   className?: string;
+  showLabels?: boolean;
+  lightIntensity?: number;
 }
 
-interface Drone3DProps {
-  drone: DronePosition;
-}
-
-function Drone3D({ drone }: Drone3DProps) {
-  const meshRef = useRef<THREE.Mesh>(null);
-
-  const color = useMemo(() => {
-    switch (drone.status) {
-      case 'active':
-        return '#00ff88';
-      case 'warning':
-        return '#ffeb3b';
-      case 'error':
-        return '#f44336';
-      default:
-        return '#9e9e9e';
-    }
-  }, [drone.status]);
-
+function Scene({
+  drones = [],
+  showLabels = false,
+  lightIntensity = 1,
+}: {
+  drones: DronePosition[];
+  showLabels?: boolean;
+  lightIntensity?: number;
+}) {
   useFrame((state) => {
-    if (meshRef.current) {
-      meshRef.current.rotation.y = state.clock.elapsedTime;
+    // 深い夜の霧効果（光をより幻想的に）
+    if (!state.scene.fog) {
+      state.scene.fog = new THREE.FogExp2(0x000011, 0.005);
     }
-  });
-
-  // Convert GPS coordinates to 3D space
-  // This is a simplified conversion - in a real app you'd use proper projection
-  const x = (drone.longitude - 139.6503) * 1000; // Center on Tokyo
-  const z = (drone.latitude - 35.6762) * 1000;
-  const y = drone.altitude / 10; // Scale altitude
-
-  return (
-    <group position={[x, y, z]}>
-      {/* Drone body */}
-      <Box ref={meshRef} args={[2, 0.5, 2]} position={[0, 0, 0]}>
-        <meshStandardMaterial color={color} />
-      </Box>
-
-      {/* Drone propellers */}
-      <Sphere args={[0.3]} position={[-1, 0.5, -1]}>
-        <meshStandardMaterial color="#333" />
-      </Sphere>
-      <Sphere args={[0.3]} position={[1, 0.5, -1]}>
-        <meshStandardMaterial color="#333" />
-      </Sphere>
-      <Sphere args={[0.3]} position={[-1, 0.5, 1]}>
-        <meshStandardMaterial color="#333" />
-      </Sphere>
-      <Sphere args={[0.3]} position={[1, 0.5, 1]}>
-        <meshStandardMaterial color="#333" />
-      </Sphere>
-
-      {/* Drone label */}
-      <Text
-        position={[0, 3, 0]}
-        fontSize={1}
-        color={color}
-        anchorX="center"
-        anchorY="middle"
-      >
-        {drone.name}
-      </Text>
-
-      {/* Battery indicator */}
-      <Text
-        position={[0, 2, 0]}
-        fontSize={0.7}
-        color={drone.battery > 30 ? '#4caf50' : '#f44336'}
-        anchorX="center"
-        anchorY="middle"
-      >
-        {drone.battery}%
-      </Text>
-    </group>
-  );
-}
-
-function Scene({ drones = [] }: { drones: DronePosition[] }) {
-  useFrame((state) => {
-    state.scene.fog = new THREE.FogExp2(0x0a0a0a, 0.02);
   });
 
   return (
     <>
-      {/* Lighting */}
-      <ambientLight intensity={0.6} />
+      {/* 最小限の環境光（夜空を表現） */}
+      <ambientLight intensity={0.05} color="#001122" />
+
+      {/* 遠くの街明かり（微妙な雰囲気作り） */}
       <directionalLight
-        position={[10, 10, 5]}
-        intensity={1}
-        castShadow
-        shadow-camera-far={50}
-        shadow-camera-left={-10}
-        shadow-camera-right={10}
-        shadow-camera-top={10}
-        shadow-camera-bottom={-10}
+        position={[50, -5, 20]}
+        intensity={0.1}
+        color="#ffaa44"
+        castShadow={false}
       />
 
-      {/* Ground plane */}
-      <mesh position={[0, -5, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-        <planeGeometry args={[100, 100]} />
-        <meshStandardMaterial color="#1a1a1a" opacity={0.8} transparent />
+      {/* 星空背景 */}
+      <mesh position={[0, 40, 0]}>
+        <sphereGeometry args={[100, 32, 32]} />
+        <meshBasicMaterial
+          color="#000011"
+          side={THREE.BackSide}
+          transparent
+          opacity={0.9}
+        />
       </mesh>
 
-      {/* Grid */}
-      <gridHelper args={[100, 20, '#444', '#444']} position={[0, -4.9, 0]} />
+      {/* 地面（見えないが参考用） */}
+      <mesh
+        position={[0, -10, 0]}
+        rotation={[-Math.PI / 2, 0, 0]}
+        receiveShadow
+      >
+        <planeGeometry args={[200, 200]} />
+        <meshStandardMaterial color="#000000" transparent opacity={0.1} />
+      </mesh>
 
-      {/* Drones */}
+      {/* ドローンライト（メインの光の祭典） */}
       {drones.map((drone) => (
-        <Drone3D key={drone.id} drone={drone} />
+        <DroneLight
+          key={drone.id}
+          drone={drone}
+          showLabels={showLabels}
+          lightIntensity={lightIntensity}
+        />
       ))}
 
-      {/* Camera controls */}
+      {/* カメラコントロール */}
       <OrbitControls
         enablePan={true}
         enableZoom={true}
         enableRotate={true}
-        minDistance={5}
-        maxDistance={50}
+        minDistance={10}
+        maxDistance={100}
         minPolarAngle={0}
         maxPolarAngle={Math.PI / 2}
+        target={[0, 5, 0]} // 空中を中心に
       />
     </>
   );
@@ -141,15 +93,28 @@ function Scene({ drones = [] }: { drones: DronePosition[] }) {
 export default function DroneScene({
   drones = [],
   className = '',
+  showLabels = false,
+  lightIntensity = 1.0,
 }: DroneSceneProps) {
   return (
     <MuiBox className={`w-full h-full ${className}`}>
       <Canvas
-        shadows
-        camera={{ position: [10, 10, 10], fov: 60 }}
-        style={{ background: 'linear-gradient(to bottom, #0a0a0a, #1a1a1a)' }}
+        camera={{ position: [20, 15, 20], fov: 75 }}
+        gl={{
+          antialias: true,
+          alpha: true,
+          powerPreference: 'high-performance',
+        }}
+        style={{
+          background:
+            'radial-gradient(ellipse at center, #000033 0%, #000000 100%)',
+        }}
       >
-        <Scene drones={drones} />
+        <Scene
+          drones={drones}
+          showLabels={showLabels}
+          lightIntensity={lightIntensity}
+        />
       </Canvas>
     </MuiBox>
   );

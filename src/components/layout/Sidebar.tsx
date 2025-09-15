@@ -53,12 +53,15 @@ export function Sidebar() {
           p: 2,
           bgcolor: 'primary.main',
           color: 'primary.contrastText',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
         }}
       >
         <Typography variant="h6" noWrap component="div">
-          Drone Show Control
+          Drone Control
         </Typography>
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
+        <Box>
           <IconButton
             size="small"
             onClick={toggleTheme}
