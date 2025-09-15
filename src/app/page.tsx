@@ -150,11 +150,14 @@ export default function Home() {
               <Typography color="textSecondary" className="mb-4">
                 Create custom flight patterns and formations
               </Typography>
-              <Box className="flex gap-2 justify-center">
-                <div className="w-8 h-8 bg-drone-primary rounded-full firework-effect"></div>
-                <div className="w-8 h-8 bg-drone-secondary rounded-full firework-effect"></div>
-                <div className="w-8 h-8 bg-drone-warning rounded-full firework-effect"></div>
-              </Box>
+              <Button
+                variant="contained"
+                className="bg-drone-secondary hover:bg-orange-600"
+                fullWidth
+                href="/patterns"
+              >
+                Pattern Generator
+              </Button>
             </CardContent>
           </Card>
 
